@@ -1,0 +1,22 @@
+{% raw %}
+
+//header.tmpl
+{{define "header"}}
+<html>
+    <head>
+        <title>{{.Title}}</title>
+    </head>
+<body>
+{{end}}
+//content.tmpl
+{{define "content"}}
+    <h1>{{.Title}}</h1>
+    <p>{{.Body}}</p>
+{{end}}
+//footer.tmpl
+{{define "footer"}}
+</body>
+</html>
+{{end}}
+
+{% endraw %}
