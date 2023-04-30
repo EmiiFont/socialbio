@@ -1,22 +1,8 @@
-{% raw %}
+{{define "title"}}Home{{end}}
 
-//header.tmpl
-{{define "header"}}
-<html>
-    <head>
-        <title>{{.Title}}</title>
-    </head>
-<body>
+{{define "main"}}
+    <header class="bg-white dark:bg-gray-900">
+        {{ template "nav" . }}
+        {{ template "content" . }}
+    </header>
 {{end}}
-//content.tmpl
-{{define "content"}}
-    <h1>{{.Title}}</h1>
-    <p>{{.Body}}</p>
-{{end}}
-//footer.tmpl
-{{define "footer"}}
-</body>
-</html>
-{{end}}
-
-{% endraw %}

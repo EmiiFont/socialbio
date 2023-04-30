@@ -20,13 +20,24 @@ type SocialBio struct {
 }
 
 func hello(w http.ResponseWriter, req *http.Request) {
+	files := []string{
+		"./templates/base.tmpl",
+		"./templates/main.tmpl",
+		"./templates/footer.tmpl",
+		"./templates/nav.tmpl",
+		"./templates/content.tmpl",
+	}
+
 	t := template.New("index.html")
-	t, err := t.ParseFiles("templates/index.html")
+	t, err := t.ParseFiles(files...)
 	if err != nil {
 		panic(err)
 	}
-	p := SocialBio{Bio: "John"}
-	t.Execute(w, p)
+	err = t.ExecuteTemplate(w, "base", nil)
+	if err != nil {
+		panic(err)
+	}
+	//t.Execute(w, p)
 }
 
 //build submit handler to handle post request of a form
@@ -49,10 +60,12 @@ func submit(w http.ResponseWriter, req *http.Request) {
 
 	openaiKey := os.Getenv("OPENAI_KEY")
 	client := openai.NewClient(openaiKey)
-	prompt := fmt.Sprintf("Generate a instagram %s bio using %s! in %s", p.Style, p.Bio, p.Language)
+	emojisPrompt := "don't include"
 	if p.Emojis {
-		prompt += "and include emojis"
+		emojisPrompt = "include"
 	}
+
+	prompt := fmt.Sprintf("Generate 1 instagram %s biography with no hashtags and clearly labeled and make sure each generated biography is less than 160 characters using %s! in %s and %s emojis", p.Style, p.Bio, p.Language, emojisPrompt)
 
 	resp, chatErr := client.CreateChatCompletion(
 		context.Background(),
@@ -77,9 +90,10 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("assets/"))))
 	http.HandleFunc("/", hello)
 	// handle post request to /submit
 	http.HandleFunc("/submit", submit)
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
 	http.ListenAndServe(":4000", nil)
 }
