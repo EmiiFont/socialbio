@@ -88,10 +88,12 @@ func main() {
 	// if err != nil {
 	// 	log.Fatal("Error loading .env file")
 	// }
+	port := os.Getenv("PORT")
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("assets/"))))
 	http.HandleFunc("/", hello)
 	// handle post request to /submit
 	http.HandleFunc("/submit", submit)
 
-	http.ListenAndServe(":4000", nil)
+	fmt.Println("✅ Server up and running on port: " + port)
+	http.ListenAndServe(":"+port, nil)
 }
