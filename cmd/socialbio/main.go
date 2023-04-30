@@ -3,12 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"text/template"
 
-	"github.com/joho/godotenv"
 	"github.com/sashabaranov/go-openai"
 )
 
@@ -86,10 +84,10 @@ func submit(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	log.Fatal("Error loading .env file")
+	// }
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("assets/"))))
 	http.HandleFunc("/", hello)
 	// handle post request to /submit
