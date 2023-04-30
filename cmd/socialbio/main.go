@@ -3,9 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"text/template"
 
+	"github.com/joho/godotenv"
 	"github.com/sashabaranov/go-openai"
 )
 
@@ -44,7 +47,8 @@ func submit(w http.ResponseWriter, req *http.Request) {
 	//create a person object
 	p := SocialBio{Bio: bio, Style: style, Emojis: emojis == "on", Language: language}
 
-	client := openai.NewClient("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")
+	openaiKey := os.Getenv("OPENA")
+	client := openai.NewClient(openaiKey)
 	prompt := fmt.Sprintf("Generate a instagram %s bio using %s! in %s", p.Style, p.Bio, p.Language)
 	if p.Emojis {
 		prompt += "and include emojis"
@@ -65,23 +69,14 @@ func submit(w http.ResponseWriter, req *http.Request) {
 	if chatErr != nil {
 		panic(chatErr)
 	}
-
-	fmt.Printf(resp.Choices[0].Message.Content)
-
-	// //create a template
-	// t := template.New("index.html")
-	// //parse the template
-	// t, err := t.ParseFiles("templates/index.html")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// //execute the template
-	// t.Execute(w, p)
 	w.Write([]byte(resp.Choices[0].Message.Content))
 }
 
 func main() {
-
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	http.HandleFunc("/", hello)
 	// handle post request to /submit
 	http.HandleFunc("/submit", submit)
