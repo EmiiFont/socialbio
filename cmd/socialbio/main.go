@@ -47,7 +47,7 @@ func submit(w http.ResponseWriter, req *http.Request) {
 	//create a person object
 	p := SocialBio{Bio: bio, Style: style, Emojis: emojis == "on", Language: language}
 
-	openaiKey := os.Getenv("OPENA")
+	openaiKey := os.Getenv("OPENAI_KEY")
 	client := openai.NewClient(openaiKey)
 	prompt := fmt.Sprintf("Generate a instagram %s bio using %s! in %s", p.Style, p.Bio, p.Language)
 	if p.Emojis {
