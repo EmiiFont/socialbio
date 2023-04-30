@@ -19,11 +19,11 @@ type SocialBio struct {
 
 func hello(w http.ResponseWriter, req *http.Request) {
 	files := []string{
-		"./templates/base.tmpl",
-		"./templates/main.tmpl",
-		"./templates/footer.tmpl",
-		"./templates/nav.tmpl",
-		"./templates/content.tmpl",
+		"templates/base.tmpl",
+		"templates/main.tmpl",
+		"templates/footer.tmpl",
+		"templates/nav.tmpl",
+		"templates/content.tmpl",
 	}
 
 	t := template.New("index.html")
@@ -89,6 +89,9 @@ func main() {
 	// 	log.Fatal("Error loading .env file")
 	// }
 	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("assets/"))))
 	http.HandleFunc("/", hello)
 	// handle post request to /submit
