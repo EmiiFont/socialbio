@@ -58,6 +58,7 @@ func LoadTemplates() error {
 func hello(w http.ResponseWriter, req *http.Request) {
 	t, ok := templates["base.tmpl"]
 	if !ok {
+		fmt.Println(templates)
 		panic("template not found")
 	}
 	err := t.ExecuteTemplate(w, "base", nil)
