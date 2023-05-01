@@ -94,7 +94,7 @@ func submit(w http.ResponseWriter, req *http.Request) {
 		emojisPrompt = "include"
 	}
 
-	prompt := fmt.Sprintf("Generate 1 instagram %s biography with no hashtags and clearly labeled and make sure each generated biography is less than 160 characters using %s! in %s and %s emojis", p.Style, p.Bio, p.Language, emojisPrompt)
+	prompt := fmt.Sprintf("Generate an twitter %s bio with no hashtags using %s! and in %s language, please %s emojis", p.Style, p.Bio, p.Language, emojisPrompt)
 
 	resp, chatErr := client.CreateChatCompletion(
 		context.Background(),
