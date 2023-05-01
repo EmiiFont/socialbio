@@ -30,6 +30,8 @@ var (
 	//go:embed templates/*
 	files     embed.FS
 	templates map[string]*template.Template
+	//go:embed assets/*
+	assets embed.FS
 )
 
 func LoadTemplates() error {
@@ -97,7 +99,8 @@ func submit(w http.ResponseWriter, req *http.Request) {
 	resp, chatErr := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model: openai.GPT3Dot5Turbo,
+			Model:     openai.GPT3Dot5Turbo,
+			MaxTokens: 200,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleUser,
@@ -125,7 +128,7 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("assets/"))))
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(assets))))
 	http.HandleFunc("/", hello)
 	// handle post request to /submit
 	http.HandleFunc("/submit", submit)
