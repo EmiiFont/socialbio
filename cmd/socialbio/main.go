@@ -2,7 +2,10 @@ package main
 
 import (
 	"context"
+	"embed"
 	"fmt"
+	"go/build"
+	"io/fs"
 	"net/http"
 	"os"
 	"text/template"
@@ -17,25 +20,50 @@ type SocialBio struct {
 	Language string
 }
 
-func hello(w http.ResponseWriter, req *http.Request) {
-	files := []string{
-		"templates/base.tmpl",
-		"templates/main.tmpl",
-		"templates/footer.tmpl",
-		"templates/nav.tmpl",
-		"templates/content.tmpl",
-	}
+const (
+	layoutsDir   = "templates"
+	templatesDir = "templates"
+	extension    = "/*.tmpl"
+)
 
-	t := template.New("index.html")
-	t, err := t.ParseFiles(files...)
+var (
+	//go:embed templates/* assets/*
+	files     embed.FS
+	templates map[string]*template.Template
+)
+
+func LoadTemplates() error {
+	if templates == nil {
+		templates = make(map[string]*template.Template)
+	}
+	tmplFiles, err := fs.ReadDir(files, templatesDir)
+	if err != nil {
+		return err
+	}
+	for _, tmpl := range tmplFiles {
+		if tmpl.IsDir() {
+			continue
+		}
+
+		pt, err := template.ParseFS(files, templatesDir+"/"+tmpl.Name(), layoutsDir+extension)
+		if err != nil {
+			return err
+		}
+
+		templates[tmpl.Name()] = pt
+	}
+	return nil
+}
+
+func hello(w http.ResponseWriter, req *http.Request) {
+	t, ok := templates["base.tmpl"]
+	if !ok {
+		panic("template not found")
+	}
+	err := t.ExecuteTemplate(w, "base", nil)
 	if err != nil {
 		panic(err)
 	}
-	err = t.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		panic(err)
-	}
-	//t.Execute(w, p)
 }
 
 //build submit handler to handle post request of a form
@@ -88,6 +116,10 @@ func main() {
 	// if err != nil {
 	// 	log.Fatal("Error loading .env file")
 	// }
+	err := LoadTemplates()
+	if err != nil {
+		panic(err)
+	}
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -97,6 +129,8 @@ func main() {
 	// handle post request to /submit
 	http.HandleFunc("/submit", submit)
 
+	fmt.Println(os.Getwd())
+	fmt.Println(build.Default.GOPATH)
 	fmt.Println("✅ Server up and running on port: " + port)
 	http.ListenAndServe(":"+port, nil)
 }
