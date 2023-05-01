@@ -27,7 +27,7 @@ const (
 )
 
 var (
-	//go:embed templates/* assets/*
+	//go:embed templates/*
 	files     embed.FS
 	templates map[string]*template.Template
 )
